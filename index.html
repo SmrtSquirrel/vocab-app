@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!-- index.html --&gt;</p>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Vocab Lookup&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="style.css" /&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;📚 Vocab Lookup&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="text" id="wordInput" placeholder="Enter a word" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="lookupWord()"&gt;Get Definition&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="result"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="exportData()" class="export"&gt;Export Saved Words&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function lookupWord() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const word = document.getElementById('wordInput').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const resultDiv = document.getElementById('result');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>resultDiv.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!word) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!res.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>resultDiv.innerHTML = `&lt;p class="error"&gt;No definition found for "${word}".&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const data = await res.json();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const meanings = data[0].meanings;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const definitions = [];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let html = `&lt;h2&gt;${word}&lt;/h2&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>meanings.forEach((m, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>m.definitions.forEach((def, i) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const defText = `${idx + 1}.${i + 1} (${m.partOfSpeech}): ${def.definition}`;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>html += `&lt;p&gt;${defText}&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>definitions.push(defText);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>resultDiv.innerHTML = html;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Save to local storage</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let saved = JSON.parse(localStorage.getItem('vocabList') || '[]');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>saved.push({ word, definitions });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>localStorage.setItem('vocabList', JSON.stringify(saved));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function exportData() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const saved = JSON.parse(localStorage.getItem('vocabList') || '[]');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (saved.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>alert('No saved words to export.');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let content = '# Vocab List\n\n';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>saved.forEach(entry =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>content += `## ${entry.word}\n`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>entry.definitions.forEach(def =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>content += `- ${def}\n`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>content += '\n';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const blob = new Blob([content], { type: 'text/markdown' });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const url = URL.createObjectURL(blob);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const a = document.createElement('a');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>a.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>a.download = 'vocab.md';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>a.click();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>URL.revokeObjectURL(url);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
