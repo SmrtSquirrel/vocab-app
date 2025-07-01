@@ -1,97 +1,315 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Lookup with Groups</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .container {
+    background: white;
+    padding: 2rem;
+    margin-top: 4rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  input, select {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  button {
+    padding: 0.75rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  button.export {
+    background-color: #28a745;
+  }
+  button.export:hover {
+    background-color: #1e7e34;
+  }
+  .danger {
+    background-color: #dc3545;
+  }
+  .danger:hover {
+    background-color: #a71d2a;
+  }
+  #result {
+    margin-top: 1.5rem;
+    line-height: 1.6;
+  }
+  .error {
+    color: red;
+    margin-top: 1rem;
+  }
+  .saved-list {
+    margin-top: 2rem;
+  }
+  .saved-word {
+    cursor: pointer;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: #e9ecef;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .saved-word:hover {
+    background: #ced4da;
+  }
+  .definitions {
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
 </head>
 <body>
-<p class="p1">&lt;!-- index.html --&gt;</p>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Vocab Lookup&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="style.css" /&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;📚 Vocab Lookup&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="text" id="wordInput" placeholder="Enter a word" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="lookupWord()"&gt;Get Definition&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="result"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="exportData()" class="export"&gt;Export Saved Words&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>async function lookupWord() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const word = document.getElementById('wordInput').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const resultDiv = document.getElementById('result');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>resultDiv.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!word) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!res.ok) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>resultDiv.innerHTML = `&lt;p class="error"&gt;No definition found for "${word}".&lt;/p&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const data = await res.json();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const meanings = data[0].meanings;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const definitions = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>let html = `&lt;h2&gt;${word}&lt;/h2&gt;`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>meanings.forEach((m, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>m.definitions.forEach((def, i) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>const defText = `${idx + 1}.${i + 1} (${m.partOfSpeech}): ${def.definition}`;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>html += `&lt;p&gt;${defText}&lt;/p&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>definitions.push(defText);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>resultDiv.innerHTML = html;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Save to local storage</p>
-<p class="p1"><span class="Apple-converted-space">      </span>let saved = JSON.parse(localStorage.getItem('vocabList') || '[]');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>saved.push({ word, definitions });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>localStorage.setItem('vocabList', JSON.stringify(saved));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function exportData() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const saved = JSON.parse(localStorage.getItem('vocabList') || '[]');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (saved.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>alert('No saved words to export.');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>let content = '# Vocab List\n\n';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>saved.forEach(entry =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>content += `## ${entry.word}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>entry.definitions.forEach(def =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>content += `- ${def}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>content += '\n';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const blob = new Blob([content], { type: 'text/markdown' });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const url = URL.createObjectURL(blob);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const a = document.createElement('a');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>a.href = url;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>a.download = 'vocab.md';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>a.click();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>URL.revokeObjectURL(url);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<div class="container">
+  <h1>📚 Vocab Lookup</h1>
+  <input type="text" id="newGroupInput" placeholder="Enter a group name" />
+  <button onclick="addGroup()">Add Group</button>
+  <select id="groupSelect" onchange="changeGroup()"></select>
+  <button onclick="deleteGroup()" class="danger">Delete Group</button>
+
+  <input type="text" id="wordInput" placeholder="Enter a word" />
+  <button onclick="lookupWord()">Get Definition</button>
+  <button onclick="exportData()" class="export">Export Saved Words</button>
+
+  <div id="result"></div>
+  <div class="saved-list" id="savedList"></div>
+</div>
+<script>
+let currentGroup = null;
+let lastLookedUpWord = '';
+
+function getGroups() {
+  return JSON.parse(localStorage.getItem('vocabGroups') || '[]');
+}
+
+function saveGroups(groups) {
+  localStorage.setItem('vocabGroups', JSON.stringify(groups));
+}
+
+function getVocab() {
+  return JSON.parse(localStorage.getItem('vocabByGroup') || '{}');
+}
+
+function saveVocab(vocab) {
+  localStorage.setItem('vocabByGroup', JSON.stringify(vocab));
+}
+
+function populateGroupSelect() {
+  const groups = getGroups();
+  const select = document.getElementById('groupSelect');
+  select.innerHTML = '';
+
+  groups.forEach(group => {
+    const opt = document.createElement('option');
+    opt.value = group;
+    opt.textContent = group;
+    select.appendChild(opt);
+  });
+
+  if (groups.length > 0) {
+    currentGroup = groups[0];
+    select.value = currentGroup;
+  }
+}
+
+function addGroup() {
+  const newGroupInput = document.getElementById('newGroupInput');
+  const newGroup = newGroupInput.value.trim();
+  if (!newGroup) return;
+
+  let groups = getGroups();
+  if (!groups.includes(newGroup)) {
+    groups.push(newGroup);
+    saveGroups(groups);
+    populateGroupSelect();
+    currentGroup = newGroup;
+    document.getElementById('groupSelect').value = newGroup;
+    renderSavedList();
+  }
+  newGroupInput.value = '';
+  document.getElementById('result').innerHTML = '';
+}
+
+function deleteGroup() {
+  if (!confirm(`Delete group "${currentGroup}"? This will remove all its words.`)) return;
+  let groups = getGroups();
+  groups = groups.filter(g => g !== currentGroup);
+  saveGroups(groups);
+
+  let vocab = getVocab();
+  delete vocab[currentGroup];
+  saveVocab(vocab);
+
+  populateGroupSelect();
+  if (groups.length > 0) {
+    currentGroup = groups[0];
+    document.getElementById('groupSelect').value = currentGroup;
+  } else {
+    currentGroup = null;
+  }
+  document.getElementById('result').innerHTML = '';
+  renderSavedList();
+}
+
+function changeGroup() {
+  const select = document.getElementById('groupSelect');
+  const selectedGroup = select.value;
+  if (selectedGroup !== currentGroup) {
+    currentGroup = selectedGroup;
+    lastLookedUpWord = '';
+    document.getElementById('result').innerHTML = '';
+    renderSavedList();
+  }
+}
+
+async function lookupWord() {
+  const word = document.getElementById('wordInput').value.trim();
+  const resultDiv = document.getElementById('result');
+  if (!word || !currentGroup) return;
+
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    if (!res.ok) {
+      resultDiv.innerHTML = `<p class="error">No definition found for "${word}".</p>`;
+      return;
+    }
+    const data = await res.json();
+    const meanings = data[0].meanings;
+    const definitions = [];
+
+    meanings.forEach((m, idx) => {
+      m.definitions.forEach((def, i) => {
+        const defText = `${idx + 1}.${i + 1} (${m.partOfSpeech}): ${def.definition}`;
+        definitions.push(defText);
+      });
+    });
+
+    let vocab = getVocab();
+    if (!vocab[currentGroup]) vocab[currentGroup] = [];
+    vocab[currentGroup] = vocab[currentGroup].filter(e => e.word.toLowerCase() !== word.toLowerCase());
+    vocab[currentGroup].unshift({ word, definitions });
+    saveVocab(vocab);
+
+    resultDiv.innerHTML = `<h2>${word}</h2>` + definitions.map(def => `<p>${def}</p>`).join('');
+    lastLookedUpWord = word.toLowerCase();
+    renderSavedList();
+  } catch (error) {
+    resultDiv.innerHTML = `<p class="error">Error fetching definition. Please try again.</p>`;
+  }
+}
+
+function renderSavedList() {
+  const savedList = document.getElementById('savedList');
+  if (!currentGroup) {
+    savedList.innerHTML = '<p>Select or add a group to see saved words.</p>';
+    return;
+  }
+  const vocab = getVocab();
+  const words = vocab[currentGroup] || [];
+  if (words.length === 0) {
+    savedList.innerHTML = '<p>No saved words yet in this group.</p>';
+    return;
+  }
+  let html = '';
+
+  if (words.length > 1 || (words.length === 1 && words[0].word.toLowerCase() !== lastLookedUpWord)) {
+    html += `<h3>Saved Words</h3><ul style="list-style:none; padding-left:0;">`;
+    words.forEach((entry, idx) => {
+      if (entry.word.toLowerCase() === lastLookedUpWord && idx === 0) return;
+      html += `
+        <li>
+          <div class="saved-word">
+            <span onclick="toggleDefinitions(${idx})">${entry.word}</span>
+            <button class="danger" onclick="deleteWord(${idx})">✕</button>
+          </div>
+          <div class="definitions hidden" id="defs-${idx}">
+            ${entry.definitions.map(d => `<p>${d}</p>`).join('')}
+          </div>
+        </li>
+      `;
+    });
+    html += '</ul>';
+  }
+
+  savedList.innerHTML = html;
+}
+
+function deleteWord(idx) {
+  let vocab = getVocab();
+  vocab[currentGroup].splice(idx, 1);
+  saveVocab(vocab);
+  renderSavedList();
+}
+
+function toggleDefinitions(idx) {
+  const defsDiv = document.getElementById(`defs-${idx}`);
+  defsDiv.classList.toggle('hidden');
+}
+
+function exportData() {
+  if (!currentGroup) return;
+  const vocab = getVocab();
+  const words = vocab[currentGroup] || [];
+  if (words.length === 0) return;
+
+  let content = `# Vocab List - ${currentGroup}\n\n`;
+  words.forEach(entry => {
+    content += `## ${entry.word}\n`;
+    entry.definitions.forEach(def => {
+      content += `- ${def}\n`;
+    });
+    content += '\n';
+  });
+
+  const blob = new Blob([content], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `vocab-${currentGroup}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+window.onload = () => {
+  populateGroupSelect();
+  renderSavedList();
+};
+</script>
 </body>
 </html>
